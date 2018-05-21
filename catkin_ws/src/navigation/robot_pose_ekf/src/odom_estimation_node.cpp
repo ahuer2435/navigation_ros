@@ -170,6 +170,9 @@ namespace estimation
 
 
   // callback function for odom data
+  /*
+   * 将odom消息转换成位置变换矩阵及其协方差,存入tf tree.
+*/
   void OdomEstimationNode::odomCallback(const OdomConstPtr& odom)
   {
     odom_callback_counter_++;
@@ -191,32 +194,31 @@ namespace estimation
     
     // activate odom
     if (!odom_active_) {
-      if (!odom_initializing_){
-	odom_initializing_ = true;
-	odom_init_stamp_ = odom_stamp_;
-	ROS_INFO("Initializing Odom sensor");      
-      }
-      if ( filter_stamp_ >= odom_init_stamp_){
-	odom_active_ = true;
-	odom_initializing_ = false;
-	ROS_INFO("Odom sensor activated");      
-      }
-      else ROS_DEBUG("Waiting to activate Odom, because Odom measurements are still %f sec in the future.", 
-		    (odom_init_stamp_ - filter_stamp_).toSec());
+        if (!odom_initializing_){
+            odom_initializing_ = true;
+            odom_init_stamp_ = odom_stamp_;
+            ROS_INFO("Initializing Odom sensor");
+        }
+        if ( filter_stamp_ >= odom_init_stamp_){
+            odom_active_ = true;
+            odom_initializing_ = false;
+            ROS_INFO("Odom sensor activated");
+        }else ROS_DEBUG("Waiting to activate Odom, because Odom measurements are still %f sec in the future.", (odom_init_stamp_ - filter_stamp_).toSec());
     }
     
     if (debug_){
-      // write to file
-      double tmp, yaw;
-      odom_meas_.getBasis().getEulerYPR(yaw, tmp, tmp);
-      odom_file_<< fixed <<setprecision(5) << ros::Time::now().toSec() << " " << odom_meas_.getOrigin().x() << " " << odom_meas_.getOrigin().y() << "  " << yaw << "  " << endl;
+        // write to file
+        double tmp, yaw;
+        odom_meas_.getBasis().getEulerYPR(yaw, tmp, tmp);
+        odom_file_<< fixed <<setprecision(5) << ros::Time::now().toSec() << " " << odom_meas_.getOrigin().x() << " " << odom_meas_.getOrigin().y() << "  " << yaw << "  " << endl;
     }
   };
 
 
-
-
   // callback function for imu data
+  /*
+   * 将imu消息转换朝向变换矩阵及其协方差,存入tf tree.
+*/
   void OdomEstimationNode::imuCallback(const ImuConstPtr& imu)
   {
     imu_callback_counter_++;
@@ -288,6 +290,9 @@ namespace estimation
 
 
   // callback function for VO data
+  /*
+   * 将ov消息转换成位置变换矩阵及其协方差,存入tf tree.
+*/
   void OdomEstimationNode::voCallback(const VoConstPtr& vo)
   {
     vo_callback_counter_++;
@@ -328,6 +333,9 @@ namespace estimation
     }
   };
 
+  /*
+   * 将gps消息转换成位置变换矩阵及其协方差,存入tf tree.
+*/
 
   void OdomEstimationNode::gpsCallback(const GpsConstPtr& gps)
   {
